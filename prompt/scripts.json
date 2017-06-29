@@ -1,0 +1,28 @@
+{
+    "scripts":[
+        {"content":"Good morning tigers!","col":"seat1"},
+        {"content":"Today is {{fullDate}}","col":"seat1"},
+        {"content":"Today's lunch menu includes...","col":"seat1"},
+        {"content":"And now to ____ with today's quote!","col":"seat1"},
+        {"content":"","col":"void"},
+        {"content":"Thank you, ____, for that tasty lunch report!","col":"seat2"},
+        {"content":"Quote of the day","col":"seat2"},
+        {"content":"{{quote}}","col":"seat2"},
+        {"content":"    - {{quoteAuth}}","col":"seat2"},
+        {"content":"Band Groups: {{band}}","col":"seat2"},
+        {"content":"Student Announcements...","col":"seat2"},
+        {"content":"And now to ____ with today's weather!","col":"seat2"},
+        {"content":"","col":"void"},
+        {"content":"","col":"void"},
+        {"content":"Thank you, ____, for that lovely weather report!","col":"seat3"},
+        {"content":"On this day in history:","col":"seat3"},
+        {"content":"{{history}}","col":"seat3"},
+        {"content":"Happy birthday to:","col":"seat3"},
+        {"content":"{{birthdays}}","col":"seat3"},
+        {"content":"Please stand, and face your flag for the pledge of allegiance.","col":"seat3"},
+        {"content":"// Pause","col":"void"},
+        {"content":"I pledge allegiance...","col":"seat3"},
+        {"content":"From ____, ____, ____, and the whole behind-the-scenes crew, this is ____ saying,","col":"seat1"},
+        {"content":"Have a {{word}} day, Laffayette!","col":"seat1"}
+    ]
+}

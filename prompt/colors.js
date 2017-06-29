@@ -1,5 +1,9 @@
 function colors() {
     this.background = color(0,0,0)
     this.text = color(255,255,255)
-    this.timer = color(200,50,50, 150)
+    this.timer = color(200,50,50,150)
+    this.seat1 = color(255,255,0,100)
+    this.seat2 = color(0,255,0,100)
+    this.seat3 = color(0,0,255,100)
+    this.void = color(0,0,0,0)
 }
