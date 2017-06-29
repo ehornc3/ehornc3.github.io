@@ -8,7 +8,7 @@ var weather
 function preload() {
     Inconsolata = loadFont("assets/Inconsolata.ttf")
     preScripts = loadJSON("scripts.json")
-    weather = loadJSON("http://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07848&days=1")  // Loads the weather from apixu!
+    weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07848&days=1")  // Loads the weather from apixu!
     console.log("Preload complete.")
 }
 
