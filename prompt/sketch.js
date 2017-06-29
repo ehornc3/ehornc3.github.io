@@ -4,10 +4,12 @@ var colors
 var Inconsolata
 var scripts = []
 var preScripts
-
+var weather
 function preload() {
     Inconsolata = loadFont("assets/Inconsolata.ttf")
     preScripts = loadJSON("scripts.json")
+    weather = loadJSON("http://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07848&days=1")  // Loads the weather from apixu!
+    console.log("Preload complete.")
 }
 
 function setup() {
@@ -41,6 +43,9 @@ function drawLines() {
             break;
             case "seat3":
                 fill(colors.seat3)
+            break;
+            case "weather":
+                fill(colors.weather)
             break;
             case "void":
                 fill(colors.void)
@@ -112,9 +117,14 @@ function processScripts() {
         preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{history}}",vars.templateHistory)
         preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{birthdays}}",vars.templateBirthdays)
         preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{word}}",vars.templateWord)
-        textSize(vars.fontSize)
+        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{currentTemp}}",weather.current.temp_f)
+        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{currentMood}}",weather.current.condition.text)
+        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{laterTemp}}",weather.forecast.forecastday[0].hour[date.getHours()+4].temp_f) // Gets the temp for 4 hours later
+        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{laterMood}}",weather.forecast.forecastday[0].hour[date.getHours()+4].condition.text)
+
 
         // This little bit of code makes sure that nothing gets cut off screen. It doesn't work too well, though.
+        textSize(vars.fontSize)
         if (textWidth(preScripts.scripts[i].content) >= width - vars.margin * 2) {
             scripts.push( { 
                 content:preScripts.scripts[i].content.substring(0, floor((width - vars.margin * 2)/vars.fontSize)*2),
