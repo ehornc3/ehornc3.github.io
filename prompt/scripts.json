@@ -13,6 +13,7 @@
         {"content":"Student Announcements...","col":"seat2"},
         {"content":"And now to ____ with today's weather!","col":"seat2"},
         {"content":"","col":"void"},
+        {"content":"Weather!","col":"void"},
         {"content":"","col":"void"},
         {"content":"Thank you, ____, for that lovely weather report!","col":"seat3"},
         {"content":"On this day in history:","col":"seat3"},
