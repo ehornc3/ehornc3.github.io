@@ -1,6 +1,6 @@
 {
     "scripts":[
-        {"content":"Good morning tigers!","col":"seat1"},
+        {"content":"Good afternoon tigers!","col":"seat1"},
         {"content":"Today is {{fullDate}}","col":"seat1"},
         {"content":"Today's lunch menu includes...","col":"seat1"},
         {"content":"And now to ____ with today's quote!","col":"seat1"},

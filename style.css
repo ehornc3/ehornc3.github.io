@@ -3,10 +3,14 @@ body {
     font-family: 'Inconsolata', monospace;
 }
 h1 {
-    font-size: 15;
+    font-size: 48px;
     text-align: center;
 }
 h2 {
     margin-left: 30px;
     margin-right: 30px;
+}
+
+li {
+    font-size: 20px;
 }

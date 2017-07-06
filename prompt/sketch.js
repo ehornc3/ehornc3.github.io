@@ -1,25 +1,26 @@
 var date
 var vars
 var colors
-var Inconsolata
-var scripts = []
-var preScripts
 var weather
+var scripts             = []
+var templatedScripts    = []
+var preScripts          = []
+var Inconsolata
 function preload() {
     Inconsolata = loadFont("assets/Inconsolata.ttf")
     preScripts = loadJSON("scripts.json")
-    weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07848&days=1")  // Loads the weather from apixu!
-    console.log("Preload complete.")
+    weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07461&days=1")
 }
 
 function setup() {
     createCanvas(innerWidth,innerHeight)
     noStroke()
     textFont(Inconsolata)
+    setSet(0)
+    setSet(1)
     date = new Date()
-    colors = new colors()
-    vars = new vars()
-    processScripts()
+    processScriptsTemplate()
+    processScriptsSize()
 }
 
 function draw() {
@@ -48,7 +49,7 @@ function drawLines() {
                 fill(colors.weather)
             break;
             case "void":
-                fill(colors.void)
+                fill(colors.blank)
             break;
         }
         rect(vars.margin,vars.margin + vars.loc + (vars.fontSize + vars.fontSize/4) * i,textWidth(scripts[i].content),vars.fontSize)
@@ -104,39 +105,50 @@ function keyDown() {
 
 }
 
-function windowResized() {resizeCanvas(innerWidth,innerHeight); processScripts()} // Makes sure all space is covered, and that the scripts are sized correctly.
+function windowResized() {resizeCanvas(innerWidth,innerHeight); processScriptsSize()} // Makes sure all space is covered, and that the scripts are sized correctly.
 function setDate() {date = new Date()} // Makes new date, ensures the date is current.
 
-function processScripts() {
-    scripts = [] // Clears the current scripts incase we want to reprocess (on resized)
+function processScriptsTemplate() {
+    templatedScripts = []
     for (var i = 0; i < preScripts.scripts.length; i++) {
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{fullDate}}",dispDay[date.getDay()] + ", " + dispMonth[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear())
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{quote}}",vars.templateQuote)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{quoteAuth}}",vars.templateQuoteauth)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{band}}",vars.templateBand)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{history}}",vars.templateHistory)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{birthdays}}",vars.templateBirthdays)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{word}}",vars.templateWord)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{currentTemp}}",weather.current.temp_f)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{currentMood}}",weather.current.condition.text)
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{laterTemp}}",weather.forecast.forecastday[0].hour[date.getHours()+4].temp_f) // Gets the temp for 4 hours later
-        preScripts.scripts[i].content = preScripts.scripts[i].content.replace("{{laterMood}}",weather.forecast.forecastday[0].hour[date.getHours()+4].condition.text)
-
-
-        // This little bit of code makes sure that nothing gets cut off screen. It doesn't work too well, though.
-        textSize(vars.fontSize)
-        if (textWidth(preScripts.scripts[i].content) >= width - vars.margin * 2) {
-            scripts.push( { 
-                content:preScripts.scripts[i].content.substring(0, floor((width - vars.margin * 2)/vars.fontSize)*2),
-                col:preScripts.scripts[i].col
-            } )
-            scripts.push( {
-                content:preScripts.scripts[i].content.substring(floor((width - vars.margin * 2)/vars.fontSize)*2, preScripts.scripts[i].length),
-                col:preScripts.scripts[i].col
-            } )
+        var futuretime;
+        templatedScripts.push({content:"temp",col:"void"})
+        templatedScripts[i].col     = preScripts.scripts[i].col
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{fullDate}}",dispDay[date.getDay()] + ", " + dispMonth[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear())
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{quote}}",vars.templateQuote)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{quoteAuth}}",vars.templateQuoteauth)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{band}}",vars.templateBand)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{history}}",vars.templateHistory)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{birthdays}}",vars.templateBirthdays)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{word}}",vars.templateWord)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{currentTemp}}",weather.current.temp_f)
+        templatedScripts[i].content = preScripts.scripts[i].content.replace("{{currentMood}}",weather.current.condition.text)
+        if (date.getHours() + 4 >= 23) {
+            templatedScripts[i].content = preScripts.scripts[i].content.replace("{{laterTemp}}","Future Temperature Unavailable")
+            templatedScripts[i].content = preScripts.scripts[i].content.replace("{{laterMood}}","Future Condition Unavailable")
         } else {
-            scripts.push(preScripts.scripts[i])
+            templatedScripts[i].content = preScripts.scripts[i].content.replace("{{laterTemp}}",weather.forecast.forecastday[0].hour[date.getHours()+4].temp_f)
+            templatedScripts[i].content = preScripts.scripts[i].content.replace("{{laterMood}}",weather.forecast.forecastday[0].hour[date.getHours()+4].condition.text)
         }
     }
-    console.log("Processed the scripts.")
+    console.log("Templated the scripts.")
+}
+
+function processScriptsSize() {
+    scripts = []
+    var k = templatedScripts.length
+    for (var i = 0; i < k; i++) {
+        if (templatedScripts[i].content.length > floor((width - vars.margin * 2)/vars.fontsize)*2) {
+            k++
+            scripts.push( {
+                content:templatedScripts[i].content.substring(0, floor((width - vars.margin * 2)/vars.fontsize)*2),
+                col    :templatedScripts[i].col
+            })
+        } else {
+            scripts.push ( {
+                content:templatedScripts[i].content,
+                col    :templatedScripts[i].col
+            })
+        }
+    }
 }
