@@ -1,21 +1,31 @@
 /*
  *  Hello, hello, hello!
  *  You must be here because you want to make a new module, isn't that right?
- *  Here's a few things you'll need to know before doing so (don't worry, I'll try to keep it short):
+ *  Here's a few things you'll need to know before doing so (pfft there was something inaccurate here so I removed it)
  *      1. Where to put your modules.
  *          Each and every module should be an object kept in the moduleList array.
  *          Each object in that array has two things: A display name (a string (disp)) and a 'draw,' which is the 'draw function' of the module.
  *          The syntax for the module's functions may look a little wonky, so here's a template.
- *              {disp:"Display name!",draw:function() {
- *                  Y o u r  c o d e  g o e s  r i g h t  h e r e !
- *                  rect(5,5,5,5)
- *                  /code
- *              } },
- *      4. I want to have input!
- *          Learn how to use the keyIsDown() thing.
- *      5. I want more functions!
- *          You (hopefully) know how objects work, go and add another function!
- *              {disp:"blah",draw:function() {moduleList[activeModule].hey()}, hey:function() {rect(5,5,5,5)}}
+ *              {disp:"Display name!",
+ *                  setup:function() {
+ *                      moduleVars.example.x = 5
+ *                  },
+ *                  draw:function() {
+ *                      Y o u r  c o d e  g o e s  r i g h t  h e r e !
+ *                      rect(x,5,5,5)
+ *                      /code
+ *                  } 
+ *              }
+ *      4. I want blahblahblahblahblah
+ *          a. More functions
+ *              You (hopefully) know how objects work, go and add another function!
+ *                 {disp:"blah",draw:function() {moduleList[activeModule].hey()}, hey:function() {rect(5,5,5,5)}}
+ *          b. Input
+ *              Use the keyIsDown() thing
+ *          c. Get rid of the vanilla background bit
+ *              Set moduleSkipVanilla to false somewhere in your module's setup function.
+ *              Remember, this will cause smearing! (Unless you want that)
+ *              This also doesn't get rid of the text. That stays there. And always will.
  *      2. Where do my variables go?
  *          Just to be extra sure that your module doesn't accidently share a variable with the main program, I advise that you keep all your variables in the moduleVars object.
  *          Further from that, keep your variables in a sub-object with the name of your module.
@@ -37,10 +47,12 @@
  */
 var fade = 255
 var fading = 'false'
+var moduleSkipVanilla = false
 var colors = {}
 var moduleVars = {}
 var moduleList = [
-    {disp:"Vanilla",
+
+    {disp:"Background",
         setup:function() {
             d = new Date()
             moduleVars.vanilla = {}
@@ -48,16 +60,21 @@ var moduleList = [
             moduleVars.vanilla.message2 = "{{temp}}"
             moduleVars.vanilla.message2 = moduleVars.vanilla.message2.replace("{{temp}}", dispDay[d.getDay()] + ", " + dispMonth[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
         },
-        draw:function() {
-            textAlign(CENTER, CENTER)
-            background(colors.orangeDark)
-            fill(colors.orange)
-            rect(width/20,height/20,width-width/20*2,height-height/20*2)
-            fill(colors.black)
-            textSize(floor(width/(moduleVars.vanilla.message1.length * 2) + (width/moduleVars.vanilla.message1.length/2) * 2))
-            text(moduleVars.vanilla.message1, width/2, height/2 - height/20)
-            textSize(floor(width/(moduleVars.vanilla.message2.length * 2) + (width/moduleVars.vanilla.message2.length/2) * 2))
-            text(moduleVars.vanilla.message2, width/2, height/2 + height/20)
+        draw:function(x) {
+            if (x=='bg') {
+                if (!moduleSkipVanilla) {
+                    background(colors.orangeDark)
+                    fill(colors.orange)
+                    rect(width/20,height/20,width-width/20*2,height-height/20*2)
+                }
+            } else if (x=='txt') {
+                fill(colors.black)
+                textAlign(CENTER, CENTER)
+                textSize(floor(width/(moduleVars.vanilla.message1.length * 2) + (width/moduleVars.vanilla.message1.length/2) * 2))
+                text(moduleVars.vanilla.message1, width/2, height/2 - height/20)
+                textSize(floor(width/(moduleVars.vanilla.message2.length * 2) + (width/moduleVars.vanilla.message2.length/2) * 2))
+                text(moduleVars.vanilla.message2, width/2, height/2 + height/20)
+            }
         }
     },
 
@@ -92,6 +109,36 @@ var moduleList = [
                 if (this.y <= 0 || this.y >= height) {
                     this.yVel *= -1
                 }
+            }
+        }
+    },
+
+    {disp:"Collapsing Grid",
+        setup:function() {
+            moduleVars.cgrid = {}
+            moduleVars.cgrid.x = random(0,width)
+            moduleVars.cgrid.y = random(0,height)
+            moduleVars.cgrid.xVel = random(10,15)
+            moduleVars.cgrid.yVel = random(10,15)
+            moduleVars.cgrid.frequency = 20
+            moduleSkipVanilla = true
+        },
+        draw:function() {
+            background(colors.orangeDark)
+            fill(colors.orange)
+            ellipseMode(CENTER)
+            for (var i = 0; i < ceil(width/moduleVars.cgrid.frequency); i++) {
+                for (var j = 0; j < ceil(height/moduleVars.cgrid.frequency); j++) {
+                    ellipse(i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency,map(dist(moduleVars.cgrid.x,moduleVars.cgrid.y,i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency),0,width,moduleVars.cgrid.frequency/2,moduleVars.cgrid.frequency*2))
+                }
+            }
+            moduleVars.cgrid.x += moduleVars.cgrid.xVel
+            moduleVars.cgrid.y += moduleVars.cgrid.yVel
+            if (moduleVars.cgrid.x <= 0 || moduleVars.cgrid.x >= width) {
+                moduleVars.cgrid.xVel *= -1
+            }
+            if (moduleVars.cgrid.y <= 0 || moduleVars.cgrid.y >= height) {
+                moduleVars.cgrid.yVel *= -1
             }
         }
     }
@@ -137,16 +184,18 @@ function draw() {
             }
         }
     } else if (fading == 'in') {
-        moduleList[0].draw()
+        moduleList[0].draw('bg')
         moduleList[activeModule].draw()
+        moduleList[0].draw('txt')
         background(0,0,0,fade)
         fade -= 5
-        if (fade >= 255) {
+        if (fade <= 0) {
             fading = 'done'
         }
     } else if (fading == 'done') {
-        moduleList[0].draw()
+        moduleList[0].draw('bg')
         moduleList[activeModule].draw()
+        moduleList[0].draw('txt')
     }
 }
 
@@ -163,12 +212,7 @@ function mousePressed() {
         }
     }
 }
-function windowResized() {resizeCanvas(innerWidth, innerHeight)}
 
 // LE GRANDE LIBRARE
-var dispDay = [
-    "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
-]
-var dispMonth = [
-    "January","February","March","April","May","June","July","August","September","October","November","December"
-]
+// tldr: Window stays the size of the whole screen, dispDay[d.getDay()] and dispMonth[d.getMonth()] work
+var dispDay = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];var dispMonth = ["January","February","March","April","May","June","July","August","September","October","November","December"];function windowResized() {resizeCanvas(innerWidth, innerHeight)}
