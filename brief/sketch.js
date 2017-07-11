@@ -52,7 +52,7 @@ var colors = {}
 var moduleVars = {}
 var moduleList = [
 
-    {disp:"Background",
+    {disp:"Vanilla",
         setup:function() {
             d = new Date()
             moduleVars.vanilla = {}
@@ -129,7 +129,7 @@ var moduleList = [
             ellipseMode(CENTER)
             for (var i = 0; i < ceil(width/moduleVars.cgrid.frequency); i++) {
                 for (var j = 0; j < ceil(height/moduleVars.cgrid.frequency); j++) {
-                    ellipse(i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency,map(dist(moduleVars.cgrid.x,moduleVars.cgrid.y,i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency),0,width,moduleVars.cgrid.frequency/2,moduleVars.cgrid.frequency*2))
+                    ellipse(i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency,map(dist(moduleVars.cgrid.x,moduleVars.cgrid.y,i*moduleVars.cgrid.frequency,j*moduleVars.cgrid.frequency),0,width,0,moduleVars.cgrid.frequency*3))
                 }
             }
             moduleVars.cgrid.x += moduleVars.cgrid.xVel
@@ -141,6 +141,77 @@ var moduleList = [
                 moduleVars.cgrid.yVel *= -1
             }
         }
+    },
+
+    {disp:"Snow",
+        setup:function() {
+            moduleVars.snow = {}
+            moduleVars.snow.arr = []
+            moduleVars.snow.diam = 10
+            moduleVars.snow.gravity = .05
+            moduleVars.snow.wind = .01
+            for (var i = 0; i < 200; i++) {
+                moduleVars.snow.arr.push(new moduleList[activeModule].speck(false))
+            }
+        },
+        draw:function() {
+            for (var i = 0; i < moduleVars.snow.arr.length; i ++) {
+                moduleVars.snow.arr[i].tick()
+            }
+            if (keyIsDown(LEFT_ARROW)) {
+                for (var i = 0; i < moduleVars.snow.arr.length; i++) {
+                    moduleVars.snow.arr[i].xAcc = -.1
+                }
+            }
+            if (keyIsDown(RIGHT_ARROW)) {
+                for (var i = 0; i < moduleVars.snow.arr.length; i++) {
+                    moduleVars.snow.arr[i].xAcc = .1
+                }
+            }
+            if (keyIsDown(32)) {
+                for (var i = 0; i < 5; i ++) {
+                    moduleVars.snow.arr.push(new moduleList[activeModule].speck(true))
+                }
+            }
+            fill(colors.white)
+            rect(0,height-height/15,width,height/15)
+        },
+        speck:function(added) {
+            if (!added) {
+                this.x = random(0,width)
+                this.y = random(height,0)
+                this.yVel = 0
+            } else {
+                this.x = width/2 + random(30,-30)
+                this.y = random(-40,-10)
+                this.yVel = 20
+            }
+            this.xVel = random(-1,1)
+            this.xAcc = 0
+            this.yAcc = 0
+            this.tick = function() {
+                fill(colors.white.levels[0],colors.white.levels[1],colors.white.levels[2],150)
+                ellipseMode(CENTER)
+                ellipse(this.x,this.y,moduleVars.snow.diam,moduleVars.snow.diam)
+                this.xVel += this.xAcc
+                this.x += this.xVel
+                this.xAcc = 0
+                this.yAcc += moduleVars.snow.gravity
+                this.yVel += this.yAcc
+                this.y += this.yVel
+                this.yAcc = 0
+                if (this.y >= height) {
+                    this.y = random(height/2 * -1,0)
+                    this.yVel = 0
+                }
+                if (this.x >= width + moduleVars.snow.diam * 2) {
+                    this.x = moduleVars.snow.diam * -1
+                }
+                if (this.x <= moduleVars.snow.diam * -2) {
+                    this.x = width + moduleVars.snow.diam
+                }
+            }
+        },
     }
 ]
 
