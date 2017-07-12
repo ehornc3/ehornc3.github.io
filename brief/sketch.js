@@ -92,22 +92,19 @@ var moduleList = [
             }
         },
         ball:function() {
-            this.x = random(0,width)
-            this.y = random(0,height)
-            this.xVel = random(2,3)
-            this.yVel = random(2,3)
+            this.pos = createVector(random(0,width),random(0,height))
+            this.vel = createVector(random(2,3),random(2,3))
             this.diam = random(10,15)
             this.tick = function() {
                 ellipseMode(CENTER)
                 fill(colors.white)
-                ellipse(this.x,this.y,this.diam,this.diam)
-                this.x += this.xVel
-                this.y += this.yVel
-                if (this.x <= 0 || this.x >= width) {
-                    this.xVel *= -1
+                ellipse(this.pos.x,this.pos.y,this.diam,this.diam)
+                this.pos.add(this.vel)
+                if (this.pos.x <= 0 || this.pos.x >= width) {
+                    this.vel.x *= -1
                 }
-                if (this.y <= 0 || this.y >= height) {
-                    this.yVel *= -1
+                if (this.pos.y <= 0 || this.pos.y >= height) {
+                    this.vel.y *= -1
                 }
             }
         }
@@ -211,7 +208,87 @@ var moduleList = [
                     this.x = width + moduleVars.snow.diam
                 }
             }
+        }
+    },
+
+    {disp:"Fireworks",
+        setup:function() {
+            moduleVars.fireworks = {}
+            moduleVars.fireworks.fireworks = []
+            moduleVars.fireworks.particles = []
+            moduleVars.fireworks.environment = createVector(random(-.005,.005),.05)
+            moduleSkipVanilla = true
+            moduleVars.fireworks.max = 2
+            moduleVars.fireworks.chance = .01
         },
+        draw:function() {
+            background(colors.orange.levels[0],colors.orange.levels[1],colors.orange.levels[2],75)
+            ellipseMode(CENTER)
+            colorMode(HSB, 360, 100, 100, 255)
+            if (moduleVars.fireworks.fireworks.length < moduleVars.fireworks.max) {
+                if(random(1) < moduleVars.fireworks.chance) {
+                    moduleVars.fireworks.fireworks.push(new moduleList[activeModule].firework())
+                }
+            }
+            for (var i = 0; i < moduleVars.fireworks.fireworks.length; i++) {
+                moduleVars.fireworks.fireworks[i].tick()
+                if (moduleVars.fireworks.fireworks[i].pos.y >= height*2) {
+                    moduleVars.fireworks.fireworks.splice(i,1)
+                }
+            }
+            for (var i = 0; i < moduleVars.fireworks.particles.length; i++) {
+                moduleVars.fireworks.particles[i].tick()
+                if (moduleVars.fireworks.particles[i].opacity <= 0) {
+                    moduleVars.fireworks.particles.splice(i,1)
+                }
+            }
+            colorMode(RGB)
+        },
+        particle:function(posX,posY,hue) {
+            this.pos = createVector(posX,posY)
+            this.vel = createVector(0,0)
+            this.acc = createVector(random(-2,2),random(-4,2))
+            this.hue = hue
+            this.diam = random(2,4)
+            this.opacity = 255
+            this.fadeRate = random(1,3)
+            this.tick = function() {
+                fill(this.hue,100,100,this.opacity)
+                ellipse(this.pos.x,this.pos.y,this.diam,this.diam)
+                this.opacity -= this.fadeRate
+                this.acc.add(moduleVars.fireworks.environment)
+                this.vel.add(this.acc)
+                this.pos.add(this.vel)
+                this.acc.mult(0)
+            }
+        },
+        firework:function() {
+            this.pos = createVector(random(0,width),height + 20)
+            this.vel = createVector(0,0)
+            this.acc = createVector(random(-.1,.1),random(-6,-8))
+            this.diam = 8
+            this.hue = random(0,360)
+            this.sat = 100
+            this.exploded = false
+            this.tick = function() {
+                fill(this.hue,this.sat,this.sat+50)
+                ellipse(this.pos.x,this.pos.y,this.diam,this.diam)
+                this.acc.add(moduleVars.fireworks.environment)
+                this.vel.add(this.acc)
+                this.pos.add(this.vel)
+                this.acc.mult(0)
+                if (this.vel.y >= 1) {
+                    if (!this.exploded) {
+                        for (var i = 0; i < random(150,200); i++) {
+                            moduleVars.fireworks.particles.push(new moduleList[activeModule].particle(this.pos.x,this.pos.y,this.hue))
+                            this.exploded = true
+                            this.diam /= 2
+                            this.sat = 0
+                        }
+                    }
+                }
+            }
+        }
     }
 ]
 
