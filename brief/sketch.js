@@ -289,6 +289,52 @@ var moduleList = [
                 }
             }
         }
+    },
+
+    {disp:"Snow Pile",
+        setup:function() {
+            moduleVars.snowpile = {}
+            moduleVars.snowpile.particles = []
+            moduleVars.snowpile.environment = createVector(Math.random() / 480, Math.random()/10)
+            moduleVars.snowpile.diam = 48
+        },
+        draw:function() {
+            ellipseMode(CENTER)
+            fill(255)
+            if(Math.random()<=.15) {
+                moduleVars.snowpile.particles.push(new moduleList[activeModule].particle())
+            }
+            for (var i = 0; i < moduleVars.snowpile.particles.length; i++) {
+                moduleVars.snowpile.particles[i].tick()
+            }
+        },
+        particle:function() {
+            this.pos = createVector(Math.random() * width, Math.random() * height/-2)
+            this.vel = createVector()
+            this.tick = function() {
+                // DRAW
+                ellipse(this.pos.x,this.pos.y,moduleVars.snowpile.diam,moduleVars.snowpile.diam)
+
+                // POSITION
+                this.vel.add(moduleVars.snowpile.environment)
+                this.pos.add(this.vel)
+
+                // WALL COLLISION
+                if (this.pos.y >= height) {
+                    this.pos.y = height
+                    this.vel.mult(0)
+                }
+                for (var i = 0; i < moduleVars.snowpile.particles.length; i++) {
+                    if (dist(this.pos.x,this.pos.y,moduleVars.snowpile.particles[i].pos.x,moduleVars.snowpile.particles[i].pos.y) <= moduleVars.snowpile.diam/1.5) {
+                        if (dist(this.pos.x,this.pos.y,moduleVars.snowpile.particles[i].pos.x,moduleVars.snowpile.particles[i].pos.y) != 0) {
+                            this.pos.add(this.vel.x * -1, this.vel.y * -1)
+                            this.vel.mult(0)
+                            this.vel.x = random(-1,1)
+                        }
+                    }
+                }
+            }
+        }
     }
 ]
 
