@@ -3,33 +3,13 @@ var scripts = {}
 var yMod = 10
 var fontSize = 72
 var inconsolata
-var y
+var ticker
 var margin
 var input
+var y
 var d
-var dispDay = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-]
-var dispMonth = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-]
+var dispDay = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+var dispMonth = ["January","February","March","April","May","June","July","August","September","October","November","December"]
 
 var preload = function() {
     weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07461&days=1")
@@ -41,7 +21,7 @@ var setup = function() {
     createCanvas(innerWidth,innerHeight)
     noStroke()
     resetDate()
-    setInterval(resetDate, 60000)
+    setInterval(resetDate, 500)
     margin = width/20
     y = margin
     colors = {
@@ -54,6 +34,10 @@ var setup = function() {
         empty:  color(0  ,0  ,0  ),
         ticker: color(255,0  ,0  ,127),
         text:   color(255,255,255)
+    }
+    ticker = {
+        mode:false,
+        start:millis()
     }
     input = {
         quote:prompt("Give a quote of the day!"),
@@ -101,6 +85,36 @@ var draw = function() {
         fill(colors.text)
         text(scripts.final[i].text,margin,i * (fontSize + fontSize/4) + y)
     }
+    fill(colors.ticker)
+    if (!ticker.mode) {
+        textAlign(LEFT,BOTTOM)
+        text(d.getMonth() + "/" + d.getDate() + "/" + d.getFullYear(),margin,height-margin)
+        textAlign(RIGHT,BOTTOM)
+        text(d.getSeconds()%10,width-margin - (fontSize/2) * 0,height-margin)
+        text(floor(d.getSeconds()/10),width-margin - (fontSize/2) * 1,height-margin)
+        text(":",width-margin - (fontSize/2) * 2.25,height-margin - fontSize/12)
+        text(d.getMinutes()%10,width-margin - (fontSize/2) * 3,height-margin)
+        text(floor(d.getMinutes()/10),width-margin - (fontSize/2) * 4,height-margin)
+        text(":",width-margin - (fontSize/2) * 5.25,height-margin - fontSize/12)
+        text(d.getHours()%10,width-margin - (fontSize/2) * 6,height-margin)
+        text(floor(d.getHours()/10),width-margin - (fontSize/2) * 7,height-margin)
+    } else {
+        textAlign(RIGHT,BOTTOM)
+        text(floor(((millis()-ticker.start)%100)/10),width-margin - (fontSize/2) * 0,height-margin)
+        text(floor(((millis()-ticker.start)%1000)/100),width-margin - (fontSize/2) * 1,height-margin)
+        text(".",width-margin - (fontSize/2) * 2.25,height-margin)
+        text(floor(((millis()-ticker.start)%10000)/1000),width-margin - (fontSize/2) * 3,height-margin)
+        text(floor(((millis()-ticker.start)%100000)/10000),width-margin - (fontSize/2) * 4,height-margin)
+    }
+}
+
+var keyPressed = function() {
+    if (keyCode == 77) {
+        ticker.mode = !ticker.mode
+    }
+    if (keyCode == 32) {
+        ticker.start = millis()
+    }
 }
 
 var windowResized = function() {
@@ -145,10 +159,6 @@ var processScripts = function() {
     }
     console.log("Scripts Templated")
     scripts.final = scripts.templated
-    sizeScripts()
-}
-
-var sizeScripts = function() {
     for (var i = 0; i < scripts.final.length; i++) {
         if (scripts.final[i].text.length > (width - margin * 2)/(fontSize/2)) {
             var temp = scripts.final[i]
