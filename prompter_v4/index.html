@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Teleprompter V4</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script>
-        <script src="prompt.js"></script>
-        <link href="style.css" type="text/css" rel="stylesheet"></link>
-        <div id="p5_loading" class="loadingclass">
-            <h1>Loading...</h1>
-        </div>
-    </head>
-    <body>
-    </body>
+
+<head>
+    <title>Teleprompter V4</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script>
+    <script src="prompt.js"></script>
+    <link href="style.css" type="text/css" rel="stylesheet"></link>
+    <div id="p5_loading" class="loadingclass">
+        <h1 id="loadingText">Loading</h1>
+        <img id="loadingCircle" src="assets/circle.png" alt="Loading...">
+        <script>
+            var doneLoading = false
+            var lr = 0
+            var li = setInterval(function () {
+                document.getElementById("loadingCircle").style.transform = "rotate(" + lr + "deg)"
+                lr += 1
+                if (doneLoading) {
+                    clearInterval(li)
+                    // Changes the Loading text to fetching input and removes loading spinny thing as it doesn't work when window.prompts are up
+                    document.getElementById("loadingText").textContent = "Fetching Input"
+                    document.getElementById("loadingCircle").style.opacity = 0
+                }
+            }, 10)
+        </script>
+    </div>
+</head>
+
+<body></body>
+
 </html>
