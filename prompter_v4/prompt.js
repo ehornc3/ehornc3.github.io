@@ -48,6 +48,8 @@ var setup = function() {
         birthdays: prompt("Whose birthdays are today?"),
         word: prompt("Finally, give a word of the day!")
     }
+    if (input.band == null || input.band == "") {input.band = "{{skip}}"}
+    if (input.birthdays == null || input.birthdays == "") {input.birthdays = "{{skip}}"}
     textFont(inconsolata)
     textSize(fontSize)
     processScripts()
@@ -83,8 +85,10 @@ var draw = function() {
                 break;
         }
         rect(margin, i * (fontSize + fontSize / 4) + y, fontSize / 2 * scripts.final[i].text.length, fontSize)
-        fill(colors.text)
-        text(scripts.final[i].text, margin, i * (fontSize + fontSize / 4) + y)
+        if(scripts.final[i].col != "empty") {
+            fill(colors.text)
+            text(scripts.final[i].text, margin, i * (fontSize + fontSize / 4) + y)
+        }
     }
     fill(colors.ticker)
     if (!ticker.mode) {
@@ -145,6 +149,7 @@ var processScripts = function() {
         scripts.templated[i].text = scripts.templated[i].text.replace("{{history}}", input.history)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{birthdays}}", input.birthdays)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{word}}", input.word)
+        if (scripts.templated[i].text.includes("{{skip}}")) {scripts.templated[i].col = "empty"}
     }
     scripts.final = scripts.templated
     for (var i = 0; i < scripts.final.length; i++) {

@@ -29,10 +29,6 @@
         {"text":"party time for about 25 seconds","col":"comment"},
         {"text":"From ____, ____, ____, and the whole behind-the-scenes crew, this is ____ saying, have a {{word}} day, Lafayette!","col":"seat1"}
     ],
-    "formatted":[
-
-    ],
-    "final":[
-
-    ]
+    "templated":[],
+    "final":[]
 }

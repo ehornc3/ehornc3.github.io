@@ -7,7 +7,7 @@
     <script src="prompt.js"></script>
     <link href="style.css" type="text/css" rel="stylesheet"></link>
     <div id="p5_loading" class="loadingclass">
-        <h1 id="loadingText">Loading</h1>
+        <h1 id="loadingText">Fetching JSONs</h1>
         <img id="loadingCircle" src="assets/circle.png" alt="Loading...">
         <script>
             var doneLoading = false
@@ -17,7 +17,6 @@
                 lr += 1
                 if (doneLoading) {
                     clearInterval(li)
-                    // Changes the Loading text to fetching input and removes loading spinny thing as it doesn't work when window.prompts are up
                     document.getElementById("loadingText").textContent = "Fetching Input"
                     document.getElementById("loadingCircle").style.opacity = 0
                 }
