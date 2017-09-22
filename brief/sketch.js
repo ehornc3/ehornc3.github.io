@@ -349,6 +349,7 @@ function setup() {
         orangeLight:    color('#ffa040'),
         orangeDark:     color('#c43e00')
     }
+    console.log(setInterval(function(){d=new Date()}, 10000)
 }
 
 function draw() {
