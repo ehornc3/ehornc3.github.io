@@ -1,5 +1,7 @@
 var colors = {}
 var scripts = {}
+var words = {}
+var quotes = {}
 var yMod = 10
 var fontSize = 72
 var inconsolata
@@ -8,8 +10,8 @@ var margin
 var input
 var y
 var d
+var l
 var printWindow
-var words = {}
 var dispDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 var dispMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -17,6 +19,7 @@ var preload = function() {
     weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07461&days=1")
     scripts = loadJSON("scripts.json")
     words = loadTable("words.csv")
+    quotes = loadTable("quotes.csv")
     inconsolata = loadFont("assets/Inconsolata.ttf")
     doneLoading = true
 }
@@ -43,9 +46,10 @@ var setup = function() {
         mode: false,
         start: millis()
     }
+    l = round(random(0,quotes.rows.length))
     input = {
-        quote: prompt("Give a quote of the day!"),
-        quoteAuth: prompt("Who is the author of that quote?"),
+        quote: prompt("Give a quote of the day!",quotes.rows[l].arr[0]),
+        quoteAuth: prompt("Who is the author of that quote?",quotes.rows[l].arr[1]),
         band: prompt("What are today's band groups?"),
         history: prompt("Give an on this day in history for today!"),
         birthdays: prompt("Whose birthdays are today?"),
