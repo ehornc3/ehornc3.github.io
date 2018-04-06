@@ -8,12 +8,15 @@ var margin
 var input
 var y
 var d
+var printWindow
+var words = {}
 var dispDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 var dispMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 var preload = function() {
     weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07461&days=1")
     scripts = loadJSON("scripts.json")
+    words = loadTable("words.csv")
     inconsolata = loadFont("assets/Inconsolata.ttf")
     doneLoading = true
 }
@@ -46,7 +49,7 @@ var setup = function() {
         band: prompt("What are today's band groups?"),
         history: prompt("Give an on this day in history for today!"),
         birthdays: prompt("Whose birthdays are today?"),
-        word: prompt("Finally, give a word of the day!")
+        word: prompt("Finally, give a word of the day!",words.rows[round(random(0,words.rows.length))].arr[0])
     }
     if (input.band == null || input.band == "") {input.band = "{{skip}}"}
     if (input.birthdays == null || input.birthdays == "") {input.birthdays = "{{skip}}"}
@@ -116,6 +119,7 @@ var draw = function() {
 var keyPressed = function() {
     if (keyCode == 77) { ticker.mode = !ticker.mode }
     if (keyCode == 32) { ticker.start = millis() }
+    if (keyCode == 80) { printDocument() }
 }
 
 var windowResized = function() {
@@ -132,26 +136,24 @@ var checkKeys = function() {
 var processScripts = function() {
     scripts.templated = []
     for (var i = 0; i < scripts.fresh.length; i++) {
-        scripts.templated[i] = scripts.fresh[i]
+        scripts.templated.push(scripts.fresh[i])
         scripts.templated[i].text = scripts.templated[i].text.replace("{{date}}", dispDay[d.getDay()] + ", " + dispMonth[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quote}}", input.quote)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quoteAuth}}", input.quoteAuth)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{band}}", input.band)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentTemp}}", Math.round(weather.current.temp_f) + " degrees")
         scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentMood}}", weather.current.condition.text)
-        if (d.getHours() + 4 >= 24) {
-            scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterTemp}}", "Forecast Temperature Unavailable")
-            scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterMood}}", "Forecast Mood Unavailable")
-        } else {
-            scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterTemp}}", round(weather.forecast.forecastday[0].hour[d.getHours() + 4].temp_f) + " degrees")
-            scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterMood}}", weather.forecast.forecastday[0].hour[d.getHours() + 4].condition.text)
-        }
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterTemp}}", round(weather.forecast.forecastday[0].day.maxtemp_f) + " degrees")
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterMood}}", weather.forecast.forecastday[0].day.condition.text)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{history}}", input.history)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{birthdays}}", input.birthdays)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{word}}", input.word)
         if (scripts.templated[i].text.includes("{{skip}}")) {scripts.templated[i].col = "empty"}
     }
-    scripts.final = scripts.templated
+    scripts.final = []
+    for (var i = 0; i < scripts.templated.length; i++) {
+        scripts.final.push(scripts.templated[i])              
+    }
     for (var i = 0; i < scripts.final.length; i++) {
         if (scripts.final[i].text.length > (width - margin * 2) / (fontSize / 2)) {
             var temp = scripts.final[i]
@@ -165,4 +167,37 @@ var processScripts = function() {
             })
         }
     }
+}
+
+var printDocument = function() {
+    printWindow = open('','printWindow','status=1')
+    for (var i = 0; i < scripts.templated.length; i++) {
+        let k
+        switch (scripts.templated[i].col) {
+            case "seat1":
+                k = "rgba(200,200,0,.25)"
+                break;
+            case "seat2":
+                k = "rgba(0,200,0,.25)"
+                break;
+            case "seat3":
+                k = "rgba(0,0,200,.25)"
+                break;
+            case "weather":
+                k = "rgba(255,0,0,.25)"
+                break;
+            case "comment":
+                k = "rgba(127,127,127,.25)"
+                break;
+            case "empty":
+                k = "rgba(0,0,0,.25)"
+                break;
+            default:
+                k = "rgba(127,127,127,.25)"
+                break;
+        }
+        printWindow.document.writeln("<p style=\"background-color:" + k + "\">" + scripts.templated[i].text + "<br /></p>")
+    }
+    printWindow.document.title = "Lafayette Morning Announcements Transcript"
+    printWindow.print()
 }
