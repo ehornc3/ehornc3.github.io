@@ -2,7 +2,7 @@ var colors = {}
 var scripts = {}
 var words = {}
 var quotes = {}
-var yMod = 10
+var yMod = 50
 var fontSize = 72
 var inconsolata
 var ticker
@@ -48,6 +48,7 @@ var setup = function() {
     }
     l = round(random(0,quotes.rows.length))
     input = {
+        date: prompt("Give the date of when these scripts will be read."),
         quote: prompt("Give a quote of the day!",quotes.rows[l].arr[0]),
         quoteAuth: prompt("Who is the author of that quote?",quotes.rows[l].arr[1]),
         band: prompt("What are today's band groups?"),
@@ -141,7 +142,8 @@ var processScripts = function() {
     scripts.templated = []
     for (var i = 0; i < scripts.fresh.length; i++) {
         scripts.templated.push(scripts.fresh[i])
-        scripts.templated[i].text = scripts.templated[i].text.replace("{{date}}", dispDay[d.getDay()] + ", " + dispMonth[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
+        // scripts.templated[i].text = scripts.templated[i].text.replace("{{date}}", dispDay[d.getDay()] + ", " + dispMonth[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear())
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{date}}", input.date)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quote}}", input.quote)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quoteAuth}}", input.quoteAuth)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{band}}", input.band)
