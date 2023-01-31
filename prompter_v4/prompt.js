@@ -16,7 +16,7 @@ var dispDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 var dispMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 var preload = function() {
-    weather = loadJSON("https://api.apixu.com/v1/forecast.json?key=866b1ffd985f43ea9ef60915172906&q=07461&days=1")
+    weather = loadJSON("https://api.openweathermap.org/data/2.5/weather?lat=41.2&lon=-74.6&units=imperial&appid=a7f49e3afb6bbbcddbdd5fb32a0ed259")
     scripts = loadJSON("scripts.json")
     words = loadTable("words.csv")
     quotes = loadTable("quotes.csv")
@@ -147,10 +147,9 @@ var processScripts = function() {
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quote}}", input.quote)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{quoteAuth}}", input.quoteAuth)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{band}}", input.band)
-        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentTemp}}", Math.round(weather.current.temp_f) + " degrees")
-        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentMood}}", weather.current.condition.text)
-        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterTemp}}", round(weather.forecast.forecastday[0].day.maxtemp_f) + " degrees")
-        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterMood}}", weather.forecast.forecastday[0].day.condition.text)
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentTemp}}", Math.round(weather.main.temp) + " degrees")
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherCurrentMood}}", weather.weather[0].description)
+        scripts.templated[i].text = scripts.templated[i].text.replace("{{weatherLaterTemp}}", round(weather.main.temp_max) + " degrees")
         scripts.templated[i].text = scripts.templated[i].text.replace("{{history}}", input.history)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{birthdays}}", input.birthdays)
         scripts.templated[i].text = scripts.templated[i].text.replace("{{word}}", input.word)
